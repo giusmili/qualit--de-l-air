@@ -1,0 +1,7 @@
+{
+  "name": "Qualité de l'Air",
+  "description": "Une application pour vérifier l'indice de qualité de l'air (IQA) et les niveaux de polluants dans votre ville actuelle en utilisant votre géolocalisation.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
