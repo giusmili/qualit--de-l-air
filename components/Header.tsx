@@ -1,5 +1,6 @@
 
 import React from 'react';
+import ThemeToggle from './ThemeToggle';
 
 const Header: React.FC = () => {
   return (
@@ -11,6 +12,7 @@ const Header: React.FC = () => {
             Qualité de votre Air
             </h1>
         </div>
+        <ThemeToggle />
       </div>
     </header>
   );

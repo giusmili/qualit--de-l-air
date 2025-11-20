@@ -38,6 +38,9 @@
 .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
 
 .flex { display: flex; }
+.inline { display: inline; }
+.inline-flex { display: inline-flex; }
+.hidden { display: none !important; }
 .flex-1 { flex: 1 1 0%; }
 .flex-grow { flex-grow: 1; }
 .flex-col { flex-direction: column; }
@@ -193,6 +196,8 @@
   .md\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
   .md\:flex-row { flex-direction: row; }
   .md\:text-left { text-align: left; }
+  .md\:inline { display: inline !important; }
+  .md\:inline-flex { display: inline-flex !important; }
 }
 @media (min-width: 1024px) {
   .lg\:p-8 { padding: var(--space-8); }
@@ -217,25 +222,7 @@
 .dark .dark\:bg-gray-900, [data-theme="dark"] .dark\:bg-gray-900 { background-color: var(--gray-900); }
 .dark .dark\:bg-red-900\/30, [data-theme="dark"] .dark\:bg-red-900\/30 { background-color: rgba(185,28,28,.3); }
 
-@media (prefers-color-scheme: dark) {
-  .dark\:bg-slate-800 { background-color: var(--slate-800); }
-  .dark\:bg-slate-900 { background-color: var(--slate-900); }
-  .dark\:bg-slate-800\/50 { background-color: rgba(30,41,59,.5); }
-  .dark\:bg-blue-900\/40 { background-color: rgba(30,58,138,.8); }
-  .dark\:bg-orange-900\/40 { background-color: rgba(124,45,18,.8); }
-  .dark\:bg-slate-900\/70 { background-color: rgba(15,23,42,.7); }
-  .dark\:text-gray-200 { color: var(--gray-200); }
-  .dark\:text-gray-100 { color: var(--gray-100); }
-  .dark\:text-gray-400 { color: var(--gray-400); }
-  .dark\:text-white { color: var(--white); }
-  .dark\:text-gray-300 { color: var(--gray-300); }
-  .dark\:text-blue-300 { color: var(--blue-50); }
-  .dark\:text-orange-300 { color: var(--orange-50); }
-  .dark\:border-slate-700 { border-color: var(--slate-700); }
-  .dark\:stroke-slate-700 { stroke: var(--slate-700); }
-  .dark\:bg-gray-900 { background-color: var(--gray-900); }
-  .dark\:bg-red-900\/30 { background-color: rgba(185,28,28,.3); }
-}
+/* Removed media-query dark variants to allow JS toggle control */
 
 /* Marges supplémentaires utilisées */
 .mr-3 { margin-right: var(--space-3); }
