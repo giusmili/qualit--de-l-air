@@ -132,9 +132,9 @@
 .bg-rose-700\/10 { background-color: rgba(190,18,60,.1); }
 
 /* Bordures */
-.border { border-width: 1px; border-style: solid; border-color: var(--gray-200); }
-.border-t { border-top-width: 1px; border-top-style: solid; }
-.border-l-4 { border-left-width: 4px; border-left-style: solid; }
+.border { border-width: 0; border-style: solid; border-color: transparent; }
+.border-t { border-top-width: 0; border-top-style: solid; }
+.border-l-4 { border-left-width: 0; border-left-style: solid; }
 .border-transparent { border-color: transparent; }
 .border-gray-200 { border-color: var(--gray-200); }
 .border-gray-300 { border-color: var(--gray-300); }

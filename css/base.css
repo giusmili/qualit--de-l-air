@@ -5,6 +5,10 @@ body { margin: 0; font-family: var(--font-sans); background: var(--gray-50); col
 
 img, svg, video, canvas { display: block; max-width: 100%; }
 button, input, select, textarea { font: inherit; color: inherit; }
+button{
+    border: 0;
+    cursor: pointer;
+}
 
 /* Mise à l’échelle typographique */
 .font-sans { font-family: var(--font-sans); }
