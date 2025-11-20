@@ -1,0 +1,25 @@
+/* Base et resets légers */
+*, *::before, *::after { box-sizing: border-box; }
+html { line-height: 1.5; -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: var(--font-sans); background: var(--gray-50); color: var(--gray-800); }
+
+img, svg, video, canvas { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* Mise à l’échelle typographique */
+.font-sans { font-family: var(--font-sans); }
+
+/* Conteneur centré responsive */
+.container { width: 100%; margin-left: auto; margin-right: auto; padding-left: var(--space-4); padding-right: var(--space-4); }
+@media (min-width: 640px) { .container { max-width: 640px; } }
+@media (min-width: 768px) { .container { max-width: 768px; } }
+@media (min-width: 1024px) { .container { max-width: 1024px; } }
+@media (min-width: 1280px) { .container { max-width: 1280px; } }
+
+/* Animations */
+@keyframes spin { to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+@keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.animate-fade-in { animation: fade-in var(--dur-500) ease-out both; }
+
