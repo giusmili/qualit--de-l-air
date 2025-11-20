@@ -26,7 +26,10 @@ async function main() {
   const svg = await readFile(svgPath);
   await ensureDir(dirname(pngPath));
   // 1200x630 recommandés pour OG
-  await sharp(svg).png({ quality: 90 }).resize(1200, 630, { fit: 'cover' }).toFile(pngPath);
+  await sharp(svg)
+    .resize(1200, 630, { fit: 'cover' })
+    .png({ compressionLevel: 9, adaptiveFiltering: true, palette: true })
+    .toFile(pngPath);
   console.log(`[og] Généré: ${pngPath}`);
 }
 
@@ -34,4 +37,3 @@ main().catch((err) => {
   console.error('[og] Erreur génération PNG:', err);
   process.exitCode = 1;
 });
-
