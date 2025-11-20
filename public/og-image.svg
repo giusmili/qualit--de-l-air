@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Qualité de l'Air - Indice AQI et recommandations">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.92)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.85)"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#0f172a" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Sun icon -->
+  <g transform="translate(960 120)">
+    <circle r="48" fill="#fde047"/>
+    <g stroke="#fde047" stroke-width="6">
+      <line x1="0" y1="-84" x2="0" y2="-64"/>
+      <line x1="0" y1="84" x2="0" y2="64"/>
+      <line x1="84" y1="0" x2="64" y2="0"/>
+      <line x1="-84" y1="0" x2="-64" y2="0"/>
+      <line x1="60" y1="60" x2="46" y2="46"/>
+      <line x1="-60" y1="60" x2="-46" y2="46"/>
+      <line x1="60" y1="-60" x2="46" y2="-46"/>
+      <line x1="-60" y1="-60" x2="-46" y2="-46"/>
+    </g>
+  </g>
+
+  <!-- Title card -->
+  <g transform="translate(80 90)" filter="url(#shadow)">
+    <rect width="840" height="450" rx="24" fill="rgba(255,255,255,0.9)"/>
+    <g transform="translate(48 56)">
+      <text x="0" y="0" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="56" font-weight="800" fill="#0f172a">Qualité de l'Air</text>
+      <text x="0" y="64" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#334155">Indice AQI et recommandations</text>
+
+      <!-- Wavy air lines -->
+      <g transform="translate(0,140)" stroke="#0ea5e9" stroke-width="6" fill="none" stroke-linecap="round">
+        <path d="M0,20 C120,0 240,40 360,20 S600,0 720,20" opacity="0.9"/>
+        <path d="M0,60 C140,40 260,80 380,60 S620,40 740,60" opacity="0.7"/>
+        <path d="M0,100 C160,80 280,120 400,100 S640,80 760,100" opacity="0.5"/>
+      </g>
+
+      <!-- Badges -->
+      <g transform="translate(0,320)">
+        <rect x="0" y="-36" rx="10" width="260" height="56" fill="#22c55e" opacity="0.12"/>
+        <text x="20" y="0" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#16a34a">AQI en temps réel</text>
+
+        <rect x="300" y="-36" rx="10" width="380" height="56" fill="#3b82f6" opacity="0.12"/>
+        <text x="320" y="0" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#2563eb">Conseils santé personnalisés</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Footer branding -->
+  <text x="80" y="590" font-family="Segoe UI, Roboto, Helvetica, Arial, sans-serif" font-size="20" fill="rgba(255,255,255,0.9)">qualite-de-lair — React + Vite</text>
+</svg>
+

@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-og.mjs && node scripts/generate-icons.mjs",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "og": "node scripts/generate-og.mjs",
+    "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.29.1",
