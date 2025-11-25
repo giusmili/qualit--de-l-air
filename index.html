@@ -54,6 +54,65 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://qualit-de-l-air.vercel.app/">
 
+  <!-- Structured Data (Schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://qualit-de-l-air.vercel.app/#org",
+        "name": "Qualité de l'Air",
+        "url": "https://qualit-de-l-air.vercel.app/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://qualit-de-l-air.vercel.app/og-image.png"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://qualit-de-l-air.vercel.app/#website",
+        "url": "https://qualit-de-l-air.vercel.app/",
+        "name": "Qualité de l'Air",
+        "inLanguage": "fr-FR",
+        "description": "Analyse de la qualité de l'air (AQI), détails des polluants et recommandations santé, par ville.",
+        "publisher": { "@id": "https://qualit-de-l-air.vercel.app/#org" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://qualit-de-l-air.vercel.app/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://qualit-de-l-air.vercel.app/#webpage",
+        "url": "https://qualit-de-l-air.vercel.app/",
+        "name": "Qualité de l'Air - Indice AQI et Conseils",
+        "inLanguage": "fr-FR",
+        "isPartOf": { "@id": "https://qualit-de-l-air.vercel.app/#website" },
+        "description": "Consultez l'AQI, les polluants (PM2.5, O3, NO2...) et des conseils de santé adaptés.",
+        "primaryImageOfPage": {
+          "@type": "ImageObject",
+          "url": "https://qualit-de-l-air.vercel.app/og-image.png",
+          "width": "1200",
+          "height": "630"
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://qualit-de-l-air.vercel.app/#app",
+        "name": "Qualité de l'Air",
+        "url": "https://qualit-de-l-air.vercel.app/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web",
+        "inLanguage": "fr-FR",
+        "audience": { "@type": "Audience", "audienceType": "Grand public" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    ]
+  }
+  </script>
+
   <script type="importmap">
   {
     "imports": {
