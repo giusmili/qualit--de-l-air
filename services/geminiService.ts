@@ -1,8 +1,55 @@
 
 import { AirQualityData } from '../types';
 
+export interface ResolvedCity {
+    displayName: string; // e.g., "Paris, France"
+    latitude: number;
+    longitude: number;
+}
+
+/**
+ * Validate and normalize a city name by querying OpenStreetMap Nominatim (forward geocoding).
+ * Returns a standardized display name and coordinates or throws on failure.
+ */
+export async function verifyCityName(input: string): Promise<ResolvedCity> {
+    const query = (input || '').trim();
+    if (!query) throw new Error('Veuillez saisir une ville.');
+
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&accept-language=fr&limit=1&q=${encodeURIComponent(query)}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) {
+        throw new Error(`Vérification de la ville impossible (HTTP ${res.status}).`);
+    }
+    const list: any[] = await res.json();
+    if (!Array.isArray(list) || list.length === 0) {
+        throw new Error('Ville introuvable. Vérifiez l’orthographe.');
+    }
+
+    const item: any = list[0];
+    const addr = item?.address || {};
+    const city = addr.city || addr.town || addr.village || addr.municipality || addr.county || item?.name;
+    const country = addr.country || '';
+    const displayName = country ? `${city}, ${country}` : String(city);
+    const latitude = parseFloat(item.lat);
+    const longitude = parseFloat(item.lon);
+
+    if (!city || Number.isNaN(latitude) || Number.isNaN(longitude)) {
+        throw new Error('Données de localisation insuffisantes pour cette ville.');
+    }
+
+    return { displayName, latitude, longitude };
+}
+
 // Read API key from Vite-injected env (see vite.config.ts)
 const API_KEY = (process.env.API_KEY || process.env.GEMINI_API_KEY) as string | undefined;
+
+// Feature flag: enable/disable public AQI usage (OpenAQ). Default: enabled.
+const USE_PUBLIC_AQI: boolean = (() => {
+    const raw = (process.env.USE_PUBLIC_AQI ?? '').toString().trim().toLowerCase();
+    if (raw === 'false' || raw === '0' || raw === 'off' || raw === 'no') return false;
+    if (raw === 'true' || raw === '1' || raw === 'on' || raw === 'yes') return true;
+    return true; // default ON for better real data when available
+})();
 
 async function getAIClient() {
     if (!API_KEY) {
@@ -85,6 +132,119 @@ export async function fetchAirQualityData(city: string): Promise<AirQualityData>
         // Fallback: generate plausible mock data so the app remains usable
         return generateMockAirQuality(city);
     }
+}
+
+// --- Public API (OpenAQ) safe fetch ---
+async function fetchFromOpenAQByCoords(lat: number, lon: number) {
+    const base = 'https://api.openaq.org/v2/latest';
+    const params = new URLSearchParams({
+        coordinates: `${lat},${lon}`,
+        radius: '15000',
+        parameter: 'pm25,pm10,o3,no2,so2,co',
+        limit: '50'
+    });
+    const url = `${base}?${params.toString()}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error(`OpenAQ HTTP ${res.status}`);
+    return res.json();
+}
+
+function toMicrograms(value: number, unit?: string): number {
+    if (!unit) return value;
+    const u = unit.toLowerCase();
+    if (u.includes('mg/m')) return value * 1000; // mg/m3 -> µg/m3
+    return value; // assume already µg/m3 or compatible
+}
+
+function aggregateMeasurements(results: any[]): Partial<Record<'pm25'|'pm10'|'o3'|'no2'|'so2'|'co', number>> {
+    const wanted = new Set(['pm25','pm10','o3','no2','so2','co']);
+    const buckets: Record<string, number[]> = {} as any;
+    for (const r of results || []) {
+        const ms = Array.isArray(r?.measurements) ? r.measurements : Array.isArray(r?.parameters) ? r.parameters : [];
+        for (const m of ms) {
+            const p = (m?.parameter || m?.name || '').toString().toLowerCase();
+            if (!wanted.has(p)) continue;
+            const v = Number(m?.value);
+            if (!Number.isFinite(v)) continue;
+            const val = toMicrograms(v, m?.unit);
+            (buckets[p] ||= []).push(val);
+        }
+    }
+    const out: any = {};
+    for (const key of wanted) {
+        const arr = buckets[key];
+        if (arr && arr.length) {
+            const avg = arr.reduce((a,b)=>a+b,0) / arr.length;
+            out[key] = Math.round(avg * 10) / 10;
+        }
+    }
+    return out;
+}
+
+function buildAqiFromPollutants(p: Partial<Record<'pm25'|'pm10'|'o3'|'no2'|'so2'|'co', number>>): number {
+    const pm25 = p.pm25 ?? 0;
+    const pm10 = p.pm10 ?? 0;
+    const aqiFromPM25 = scale(pm25, [0, 12, 35.4, 55.4, 150.4], [0, 50, 100, 150, 200]);
+    const aqiFromPM10 = scale(pm10, [0, 54, 154, 254, 354], [0, 50, 100, 150, 200]);
+    return Math.max(Math.round(aqiFromPM25), Math.round(aqiFromPM10));
+}
+
+export async function fetchAirQualityDataPublic(city: string, coords?: { latitude: number; longitude: number; }): Promise<AirQualityData> {
+    // Prefer coordinates if provided for accuracy; otherwise try to verify city name to coords
+    let lat: number | undefined = coords?.latitude;
+    let lon: number | undefined = coords?.longitude;
+    if ((lat == null || lon == null) && city) {
+        try {
+            const verified = await verifyCityName(city);
+            lat = verified.latitude;
+            lon = verified.longitude;
+        } catch {
+            // If we cannot verify, throw to let caller fallback
+            throw new Error('Impossible de localiser la ville pour OpenAQ');
+        }
+    }
+    if (lat == null || lon == null) throw new Error('Coordonnées manquantes pour OpenAQ');
+
+    const data = await fetchFromOpenAQByCoords(lat, lon);
+    const results = Array.isArray(data?.results) ? data.results : [];
+    if (!results.length) throw new Error('Aucune donnée OpenAQ disponible');
+
+    const agg = aggregateMeasurements(results);
+    const aqi = buildAqiFromPollutants(agg);
+    const rec = recommendations(aqi);
+
+    return {
+        aqi,
+        pollutants: {
+            pm25: { value: agg.pm25 ?? 0, unit: 'µg/m³' },
+            pm10: { value: agg.pm10 ?? 0, unit: 'µg/m³' },
+            o3: { value: agg.o3 ?? 0, unit: 'µg/m³' },
+            no2: { value: agg.no2 ?? 0, unit: 'µg/m³' },
+            so2: { value: agg.so2 ?? 0, unit: 'µg/m³' },
+            co: { value: agg.co ?? 0, unit: 'µg/m³' },
+        },
+        healthRecommendations: rec,
+        simulated: false,
+    };
+}
+
+export async function fetchAirQualityDataSafe(city: string, coords?: { latitude: number; longitude: number; }): Promise<AirQualityData> {
+    // Try public data first (if enabled); if anything fails, fallback seamlessly to existing flow
+    if (USE_PUBLIC_AQI) {
+        try {
+            return await fetchAirQualityDataPublic(city, coords);
+        } catch (e) {
+            console.warn('Public API failed, falling back to Gemini/mock:', e);
+        }
+    } else {
+        console.info('Public AQI disabled via USE_PUBLIC_AQI flag; using Gemini/mock flow.');
+    }
+    try {
+        return await fetchAirQualityData(city);
+    } catch (e) {
+        console.warn('Gemini failed, falling back to mock:', e);
+    }
+    return generateMockAirQuality(city);
 }
 
 function generateMockAirQuality(city: string): AirQualityData {

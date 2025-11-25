@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { fetchCityName, fetchAirQualityData } from './services/geminiService';
+import { fetchCityName, fetchAirQualityDataSafe, verifyCityName } from './services/geminiService';
 import { AirQualityData, Coordinates } from './types';
 import Header from './components/Header';
 import AqiDisplay from './components/AqiDisplay';
@@ -46,7 +46,7 @@ const App: React.FC = () => {
       setCity(cityName);
 
       setLoading(`Analyse de la qualité de l'air pour ${cityName}...`);
-      const data = await fetchAirQualityData(cityName);
+      const data = await fetchAirQualityDataSafe(cityName, coords || undefined);
       setAirQuality(data);
       setError(null);
     } catch (err) {
@@ -67,6 +67,38 @@ const App: React.FC = () => {
       setAirQuality(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur inconnue est survenue.');
+    } finally {
+      setLoading('');
+    }
+  }, []);
+
+  const sanitizeCity = (s: string) => {
+    return s
+      .normalize('NFKC')
+      .replace(/[^\p{L}\s,'-]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const handleCitySearchVerified = useCallback(async (manualCity: string) => {
+    setError(null);
+    setCoords(null);
+    setAirQuality(null);
+    const sanitized = sanitizeCity(manualCity);
+    if (!sanitized || /[0-9]/.test(sanitized) || sanitized.length < 2) {
+      setLoading('');
+      setError("Nom de ville invalide. Utilisez uniquement des lettres, espaces, apostrophes et tirets.");
+      return;
+    }
+    try {
+      setLoading(`Vérification de la ville "${sanitized}"...`);
+      const resolved = await verifyCityName(sanitized);
+      setCity(resolved.displayName);
+      setLoading(`Analyse de la qualité de l'air pour ${resolved.displayName}...`);
+      const data = await fetchAirQualityDataSafe(resolved.displayName, { latitude: resolved.latitude, longitude: resolved.longitude });
+      setAirQuality(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ville introuvable ou erreur réseau.');
     } finally {
       setLoading('');
     }
@@ -108,7 +140,7 @@ const App: React.FC = () => {
             </div>
             <div className="p-4 rounded-lg bg-white dark:bg-slate-800 shadow">
               <div className="mb-2 text-sm text-gray-600 dark:text-gray-400">Ou rechercher par ville</div>
-              <CitySearch onSubmit={handleCitySearch} disabled={!!loading} />
+              <CitySearch onSubmit={handleCitySearchVerified} disabled={!!loading} />
             </div>
           </div>
         )}
