@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-og.mjs && node scripts/generate-icons.mjs && node scripts/inject-og-version.mjs && node scripts/inject-og-extras.mjs && node scripts/inject-sw-version.mjs",
+    "prebuild": "node scripts/ensure-og.mjs && node scripts/generate-icons.mjs && node scripts/inject-og-version.mjs && node scripts/inject-og-extras.mjs && node scripts/inject-sw-version.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "og": "node scripts/generate-og.mjs",
+    "og": "node scripts/ensure-og.mjs",
     "icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
